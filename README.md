@@ -1,5 +1,6 @@
 # Express-Crave
 
+(The Application is not yet completed and is still under progress)
 Express-Crave is a Redux project where people can order pizza without authentication.
 
 ---
