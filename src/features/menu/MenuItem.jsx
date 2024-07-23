@@ -6,8 +6,8 @@ import DeleteItem from "../cart/DeleteItem";
 import UpdateItemQuantity from "../cart/UpdateItemQuantity";
 
 function MenuItem({ pizza }) {
-  const { id, name, unitPrice, ingredients, soldOut, imageUrl } = pizza;
   const dispatch = useDispatch();
+  const { id, name, unitPrice, ingredients, soldOut, imageUrl } = pizza;
 
   const currentQuantity = useSelector(getItemCurrentQuantity(id));
 
@@ -16,9 +16,9 @@ function MenuItem({ pizza }) {
   function handleAddToCart() {
     const newItem = {
       pizzaId: id,
-      name: name,
+      name,
       quantity: 1,
-      price: unitPrice,
+      unitPrice,
       totalPrice: unitPrice * 1,
     };
 
@@ -32,18 +32,18 @@ function MenuItem({ pizza }) {
         alt={name}
         className={`h-24 ${soldOut ? "opacity-50 grayscale" : ""}`}
       />
-      <div className="flex flex-col grow">
+      <div className="flex grow flex-col">
         <p className="font-medium">{name}</p>
-        <p className="text-sm capitalize italic text-stone-800 ">
+        <p className="text-sm capitalize italic text-stone-800">
           {ingredients.join(", ")}
         </p>
-        <div className="mt-auto flex justify-between items-center ">
+        <div className="mt-auto flex items-center justify-between">
           {!soldOut ? (
-            <p className="text-sm text-green-700 font-medium">
+            <p className="text-sm font-medium text-green-700">
               {formatCurrency(unitPrice)}
             </p>
           ) : (
-            <p className="text-sm uppercase text-red-700 font-medium">
+            <p className="text-sm font-medium uppercase text-red-700">
               Sold out
             </p>
           )}

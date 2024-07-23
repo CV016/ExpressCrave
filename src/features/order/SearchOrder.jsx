@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function SearchOrder() {
@@ -8,7 +8,6 @@ export default function SearchOrder() {
   function handleSubmit(e) {
     e.preventDefault();
     if (!query) return;
-
     navigate(`/order/${query}`);
     setQuery("");
   }

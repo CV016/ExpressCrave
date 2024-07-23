@@ -3,8 +3,11 @@ import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { createOrder } from "../../services/apiRestaurant";
 import Button from "../../UI/Button";
 import { useSelector } from "react-redux";
-import { getCart } from "../cart/cartSlice";
+import { clearCart, getCart, getTotalCartPrice } from "../cart/cartSlice";
 import EmptyCart from "../cart/EmptyCart";
+import store from "../../store";
+import { formatCurrency } from "../../utils/helpers";
+import { getUsername } from "../user/userSlice";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
@@ -13,19 +16,23 @@ const isValidPhone = (str) =>
   );
 
 function CreateOrder() {
-  const username = useSelector((state) => state.user.username);
+  const [withPriority, setWithPriority] = useState(false);
+  const username = useSelector(getUsername);
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const formError = useActionData();
 
-  const [withPriority, setWithPriority] = useState(false);
+  const PRIORITY_PERCENTAGE = 0.2;
   const cart = useSelector(getCart);
+  const totalCartPrice = useSelector(getTotalCartPrice);
+  const priorityPrice = withPriority ? totalCartPrice * PRIORITY_PERCENTAGE : 0;
+  const finalPrice = totalCartPrice + priorityPrice;
   if (!cart.length) return <EmptyCart />;
   console.log(cart);
 
   return (
     <div className="px-4 py-6">
-      <h2 className="text-xl font-semibold mb-8">Ready to order? Lets go!</h2>
+      <h2 className="mb-8 text-xl font-semibold">Ready to order? Lets go!</h2>
 
       <Form method="POST">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -44,7 +51,7 @@ function CreateOrder() {
           <div className="grow">
             <input type="tel" name="phone" className="input w-full" required />
             {formError?.phone && (
-              <p className="text-sm p-2 text-red-800 bg-red-200 mt-2 rounded-md">
+              <p className="mt-2 rounded-md bg-red-200 p-2 text-sm text-red-800">
                 {formError.phone}
               </p>
             )}
@@ -79,8 +86,14 @@ function CreateOrder() {
 
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
-          <Button disabled={isSubmitting} type="primary">
-            {isSubmitting ? "Placing Order..." : "Order Now"}
+          <Button
+            disabled={isSubmitting}
+            type="primary"
+            className={{ isSubmitting } ? "opacity-20" : ""}
+          >
+            {isSubmitting
+              ? "Placing Order..."
+              : `Order Now for ${formatCurrency(finalPrice)}`}
           </Button>
         </div>
       </Form>
@@ -97,10 +110,10 @@ export async function action({ request }) {
   const order = {
     ...data,
     cart: JSON.parse(data.cart),
-    priority: data.priority === "on",
+    priority: data.priority === "true",
   };
 
-  console.log("this is the order");
+  // console.log("this is the order");
   console.log(order);
 
   const errors = {};
@@ -112,6 +125,7 @@ export async function action({ request }) {
   if (Object.keys(errors).length > 0) return errors;
 
   const newOrder = await createOrder(order);
+  store.dispatch(clearCart());
   return redirect(`/order/${newOrder.id}`);
 
   // return null;

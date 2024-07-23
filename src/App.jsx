@@ -40,6 +40,8 @@ const router = createBrowserRouter([
         element: <Order />,
         loader: OrderLoader,
         errorElement: <Error />,
+        // Added this line now
+        // action: updateOrderAction,
       },
     ],
   },
