@@ -48,6 +48,6 @@ To start the project, it is necessary to download the files from the github repo
 ---
 
 ## References
-I made this project with the help of Jonas Schmedtmann inspired from ReactPizza.
+I made this project with the help of Jonas inspired from ReactPizza.
 
 [Back To The Top](#fast-react-pizza-co.)
